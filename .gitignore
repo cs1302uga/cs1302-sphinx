@@ -214,3 +214,6 @@ node_modules/
 
 # these files are generated at build time
 /src/cs1302_sphinx/theme/cs1302_base/static/
+
+# documentation build directory
+/docs/_build
