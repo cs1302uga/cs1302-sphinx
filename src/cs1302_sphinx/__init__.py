@@ -9,20 +9,10 @@ from bs4 import BeautifulSoup
 THEME_PATH = (Path(__file__).parent / "theme" / "cs1302_base").resolve()
 
 
-def emit_config(app: Sphinx, config: Config) -> None:
-    from pprint import pformat
-
-    print()
-    print("Sphinx Configuration")
-    for name in sorted(config.values.keys()):
-        value = config[name]
-        print(name, "=", pformat(value))
-
-
-class Filters:
+class JinjaFilters:
     """TODO."""
 
-    PRESERVE_WHITESPACE_ELEMENTS = [
+    PRESERVE_WHITESPACE_TAGS = [
         "p",
         "pre",
         "a",
@@ -48,18 +38,29 @@ class Filters:
         soup: BeautifulSoup = BeautifulSoup(
             markup,
             "html5lib",
-            preserve_whitespace_tags=Filters.PRESERVE_WHITESPACE_ELEMENTS,
+            preserve_whitespace_tags=JinjaFilters.PRESERVE_WHITESPACE_TAGS,
         )
         tidy: str = str(soup.prettify(formatter="html5"))
         return tidy
 
 
-def emit_builder(app: Sphinx) -> None:
+def emit_config(app: Sphinx, config: Config) -> None:
+    from pprint import pformat
+
+    print(app)
+    print("Sphinx Configuration")
+    for name in sorted(config.values.keys()):
+        value = config[name]
+        print(name, "=", pformat(value))
+
+
+def configure_builder(app: Sphinx) -> None:
+    """TODO."""
     if isinstance(app.builder.templates, JinjaTemplateLoader):
         # app.builder.templates.environment.lstrip_blocks = True
         # app.builder.templates.environment.trim_blocks = True
         # app.builder.templates.environment.keep_trailing_newline = True
-        app.builder.templates.environment.filters["tidy"] = Filters.tidy
+        app.builder.templates.environment.filters["tidy"] = JinjaFilters.tidy
 
     # from pprint import pformat
 
@@ -90,5 +91,5 @@ def setup(app: Sphinx) -> dict[str, Any]:
         types=[str],
     )
     app.connect("config-inited", emit_config)
-    app.connect("builder-inited", emit_builder)
+    app.connect("builder-inited", configure_builder)
     return {"parallel_read_safe": True, "parallel_write_safe": True, "version": "0.1.0"}

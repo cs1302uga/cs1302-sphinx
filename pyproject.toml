@@ -58,6 +58,7 @@ Homepage = "https://cs1302uga.github.io/cs1302-sphinx/"
 [dependency-groups]
 dev = [
     "pre-commit~=4.2",
+    "sphinx-autobuild>=2024.10.3",
 ]
 
 [project.entry-points]
