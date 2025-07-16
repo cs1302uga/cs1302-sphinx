@@ -1,0 +1,169 @@
+{% filter tidy %}
+<!doctype html>
+<html{% if language is not none %} lang="{{ language }}"{% endif %}>
+  <head>
+    {% block site_meta %}
+      <meta charset="utf-8" />
+      <meta name="color-scheme" content="light dark">
+      {% if metatags %}
+        {% filter indent(width=0) %}
+          {{ metatags }}
+        {% endfilter -%}
+      {% endif %}
+      {% if favicon_url %}
+        <link rel="shortcut icon" href="{{ favicon_url }}"/>
+      {% endif %}
+    {% endblock site_meta %}
+    {% block htmltitle %}
+      {% if not docstitle %}
+        <title>{{ title|striptags|e }}</title>
+      {% elif pagename == master_doc %}
+        <title>{{ docstitle|striptags|e }}</title>
+      {% else %}
+        <title>{{ title|striptags|e }} - {{ docstitle|striptags|e }}</title>
+      {% endif %}
+    {% endblock htmltitle %}
+
+    {%- block styles -%}
+      {# Custom stylesheets #}
+      {%- block regular_styles -%}
+        {%- for css in css_files -%}
+          {% if css|attr("filename") -%}
+            {{ css_tag(css) }}
+          {%- else -%}
+            <link rel="stylesheet" href="{{ pathto(css, 1)|e }}" type="text/css" />
+          {%- endif %}
+        {% endfor -%}
+      {%- endblock regular_styles -%}
+      {#- Theme-related stylesheets -#}
+      {%- block theme_styles %}
+        {# <link rel="preconnect" href="https://fonts.googleapis.com"> #}
+        {# <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> #}
+        {# <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&display=swap" rel="stylesheet"> #}
+        {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" crossorigin="anonymous"> #}
+        {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" crossorigin="anonymous"> #}
+        <style>
+          @font-face {
+            font-family: myFirstFont;
+            src: url(static/fonts/ArrowType-Recursive-1.085/Recursive_Web/woff2_variable/_static/sansation_bold.woff);
+            font-weight: bold;
+          }
+
+          :root {
+          --bs-font-sans-serif: "Recursive", sans-serif;
+          --bs-font-monospace: "Recursive", monospace;
+          }
+
+
+          code, .highlight > pre, .highlight > pre * {
+          font-variation-settings:
+          "slnt" 0,
+          "CASL" 0,
+          "CRSV" 0,
+          "MONO" 1;
+          }
+
+        </style>
+        {# {% include "partials/_head_css_variables.html" with context %} #}
+      {%- endblock -%}
+      {%- block extra_styles %}
+      {%- endblock -%}
+    {%- endblock styles -%}
+
+  </head>
+  <body>
+    <script>
+      const theme = localStorage.getItem("theme") || "auto";
+      if (theme === 'auto') {
+        document.body.dataset.bsTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } else {
+        document.body.dataset.bsTheme = theme;
+      } // if
+    </script>
+
+    {% block body %}
+
+      <header class="navbar navbar-expand bg-body-tertiary shadow-sm mb-3 mb-lg-4">
+          <div class="container-lg px-0 px-sm-4">
+            <button class="btn icon d-md-none me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar-left" aria-controls="sidebar-left">
+              <span class="bi bi-list"></span>
+            </button>
+            <div class="navbar-brand d-inline-flex align-items-center h6 fs-6 m-0 gap-2">
+              <i class="navbar-brand-icon bi bi-clipboard-pulse"></i>
+              <span class="navbar-brand-text m-0">{{ docstitle if docstitle else project }}</span>
+            </div>
+            <div class="d-flex flex-row">
+              <button class="btn icon" type="button">
+                <i class="bi bi-download"></i>
+              </button>
+              <button class="btn icon" type="button">
+                <i class="bi bi-gear"></i>
+              </button>
+              <button class="btn icon" type="button">
+                <i class="bi bi-circle-half"></i>
+              </button>
+
+              <button class="d-xl-none btn me-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar-right" aria-controls="sidebar-right">
+                <span class="bi bi-three-dots"></span>
+              </button>
+            </div>
+          </div>
+      </header>
+
+      <div class="container-lg px-0 px-sm-4 d-flex flex-row gap-3">
+
+        <aside class="d-sm-block offcanvas-md offcanvas-start border-end pe-md-3 pe-lg-4" style="min-width: 20%;" tabindex="-1" id="sidebar-left" aria-labelledby="sidebar-left-label">
+          <div class="offcanvas-header border-bottom">
+            <a class="offcanvas-title navbar-brand d-inline-flex gap-2" href="#">
+              <i class="navbar-brand-icon bi bi-clipboard-pulse me-1 gap-2"></i>
+              <span class="navbar-brand-text">{{ docstitle if docstitle else project }}</span>
+            </a>
+            <button type="button" class="btn-close d-md-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebar-left" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body small">
+            <p class="mb-0">This is content within an <code>.offcanvas-md</code>.</p>
+          </div>
+        </aside>
+
+        <article role="main" class="d-flex flex-column mx-3" style="width: 100%;">
+          {% block content %}{{ body }}{% endblock %}
+          </article>
+        </main>
+
+        <aside class="d-sm-block offcanvas-xl offcanvas-end ps-xl-3 ps-xxl-4" tabindex="-1" id="sidebar-right" aria-labelledby="sidebar-right-label">
+          <div class="offcanvas-header d-lg-block p-3 px-xl-0 m-0 mb-xl-3 small border-bottom">
+            <span class="offcanvas-title" id="sidebar-right-label">On this page</span>
+            <button type="button" class="btn-close d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebar-right" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body small">
+            <p class="mb-0">This is content within an <code>.offcanvas-xl</code>.</p>
+          </div>
+        </aside>
+
+      </div>
+
+    {# <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" #}
+    {#         integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" #}
+    {#         crossorigin="anonymous"></script> #}
+
+  {% endblock %}
+  {%- block scripts -%}
+
+    {# Custom JS #}
+    {%- block regular_scripts -%}
+    {% for path in script_files -%}
+      {{ js_tag(path) }}
+    {% endfor -%}
+    {%- endblock regular_scripts -%}
+
+    {# Theme-related JavaScript code #}
+    {%- block theme_scripts -%}
+      <scrtipt>
+
+      </script>
+    {%- endblock -%}
+
+  {%- endblock scripts -%}
+  </body>
+</html>
+{% endfilter %}

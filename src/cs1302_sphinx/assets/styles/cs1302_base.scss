@@ -1,0 +1,13 @@
+/*!
+ * cs1302-sphinx: cs1302_base.scss
+ * Copyright 2025 cs1302-sphinx Authors
+ * Licensed under MIT (https://github.com/cs1302uga/cs1302-sphinx/blob/main/LICENSE)
+ */
+
+@import "bootstrap/scss/bootstrap";
+@import "_fonts";
+@import "_icons";
+
+.media-print-only {
+    display: none;
+}
